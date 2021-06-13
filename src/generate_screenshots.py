@@ -17,7 +17,7 @@ def get_raster_extent(raster_path):
 
 
 def get_rio_array(raster_path):
-    with rio.open(rgb_tif_path) as raster:
+    with rio.open(raster_path) as raster:
         raster_plt_array = raster.read()
         return raster_plt_array
 
