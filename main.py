@@ -53,7 +53,7 @@ if __name__ == "__main__":
     for filename in os.listdir(flooded_files_out_dir):
         if filename.endswith(".shp"):
             shp_path = os.path.join(flooded_files_out_dir, filename)
-            task_list.append([rgb_tif_path, shp_path, out_dir, water_opaqueness_factor])
+            task_list.append([rgb_tif_path, shp_path, screenshots_dir, water_opaqueness_factor])
     print("total {} screenshots will be generated".format(len(task_list)))
     p = Pool(num_processes)
     p.starmap(save_water_logged_img, task_list)
