@@ -38,7 +38,7 @@ if __name__ == "__main__":
     for i in range(
         start_water_level_cm, end_water_level_cm + step_size_cm, step_size_cm
     ):
-        task_list.append([dem_path, i / 100, out_dir])
+        task_list.append([dem_path, i / 100, flooded_files_out_dir])
     print("Files for total {} sea rise levels will be generated".format(len(task_list)))
     p = Pool(num_processes)
     p.starmap(generate_flooded_shp, task_list)
