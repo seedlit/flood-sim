@@ -7,7 +7,7 @@ Author: Naman Jain
 
 import os
 from multiprocessing import Pool
-from src.generated_flooded_shps import generate_flooded_shp
+from src.generate_flooded_shps import generate_flooded_shp
 from src.generate_screenshots import save_water_logged_img
 from src.generate_gif import save_gif_with_pil
 
