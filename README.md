@@ -9,3 +9,6 @@ I collected the data in 2019 using a DJI Phantom 3 Advanced. I used Agisoft Phot
 
 ### Example 2 - Under construction Research Park at [IIT Gandhinagar](https://iitgn.ac.in/)
 ![Research Park](./results/iitgn_research_park.gif)
+
+### Usage
+Update the paramaters inside main.py and run main.py
