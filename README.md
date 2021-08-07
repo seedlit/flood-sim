@@ -11,4 +11,7 @@ I collected the data in 2019 using a DJI Phantom 3 Advanced. I used Agisoft Phot
 ![Research Park](./results/iitgn_research_park.gif)
 
 ### Usage
-Update the paramaters inside main.py and run main.py
+Run main.py and pass the paths and parameters as arguments <br/>
+Example: `python main.py --dsm sample_data/sample_dsm.tif --rgb sample_data/sample_rgb_ortho.tif ` <br/> <br/>
+Example with parameters: `python main.py --dsm sample_data/sample_dsm.tif --rgb sample_data/sample_rgb_ortho.tif --num_processes 2 --start_elev 19500 --end_elev 19700 --step_size 5 --gif_duration 20 --opaquenes 0.7`
+
