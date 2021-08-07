@@ -1,7 +1,6 @@
 import numpy as np
 import gdal
 import os
-from numpy.lib.polynomial import poly
 import osr, ogr, gdal
 
 # import matlplotlib.pyplot as plt
