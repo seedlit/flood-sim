@@ -1,6 +1,7 @@
 import numpy as np
 import gdal
 import os
+from numpy.lib.polynomial import poly
 import osr, ogr, gdal
 
 # import matlplotlib.pyplot as plt
@@ -51,8 +52,14 @@ def remove_background(shp_path, remove_DN_value=0):
     lyr = ds.GetLayer()
     i = 0
     for _ in lyr:
-        if _["value"] == remove_DN_value:
-            lyr.DeleteFeature(i)
+        try:
+            # used when GRASS's raster_to_vector function was used
+            if _["value"] == remove_DN_value:
+                lyr.DeleteFeature(i)
+        except:
+            # used when GDAL's polygonize_raster function was used
+            if _["DN"] == remove_DN_value:
+                lyr.DeleteFeature(i)
         i += 1
     ds.Destroy()
 
@@ -69,6 +76,28 @@ def raster_to_vector(raster_path, vector_path, temp_variable):
     os.system(rmdir)
 
 
+def polygonize_raster(raster_path, out_vector_path):
+    sourceRaster = gdal.Open(raster_path)
+    band = sourceRaster.GetRasterBand(1)
+    driver = ogr.GetDriverByName("ESRI Shapefile")
+    outShp = out_vector_path
+    # If shapefile already exist, delete it
+    if os.path.exists(outShp):
+        driver.DeleteDataSource(outShp)
+    outDatasource = driver.CreateDataSource(outShp)
+    # get proj from raster
+    srs = osr.SpatialReference()
+    srs.ImportFromWkt(sourceRaster.GetProjectionRef())
+    # create layer with proj
+    outLayer = outDatasource.CreateLayer(outShp, srs)
+    # Add class column (0,255) to shapefile
+    newField = ogr.FieldDefn("DN", ogr.OFTInteger)
+    outLayer.CreateField(newField)
+    gdal.Polygonize(band, None, outLayer, 0, [], callback=None)
+    outDatasource.Destroy()
+    sourceRaster = None
+
+
 def generate_flooded_shp(dem_path, sea_level_rise, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     out_dem_path = os.path.join(
@@ -82,7 +111,10 @@ def generate_flooded_shp(dem_path, sea_level_rise, out_dir):
     from time import time
 
     start_time = time()
-    raster_to_vector(out_dem_path, out_shp_path, int(sea_level_rise * 100))
+    # GRASS's implementation - raster_to_vector function is around 10x faster than GDAL's implementation - polygonize_raster
+    # if you have GRASS installed, uncomment the next line, and comment the polygonize_raster function line
+    # raster_to_vector(out_dem_path, out_shp_path, int(sea_level_rise * 100))
+    polygonize_raster(out_dem_path, out_shp_path)
     print(
         "########################## polygonization took {} seconds".format(
             time() - start_time
@@ -104,7 +136,9 @@ if __name__ == "__main__":
     step_size_cm = 10
 
     task_list = []
-    for i in range(start_sea_level_cm, end_sea_level_cm + step_size_cm, step_size_cm):
+    for i in range(
+        start_water_level_cm, end_water_level_cm + step_size_cm, step_size_cm
+    ):
         task_list.append([dem_path, i / 100, out_dir])
     print("Files for total {} sea rise levels will be generated".format(len(task_list)))
     p = Pool(num_processes)
